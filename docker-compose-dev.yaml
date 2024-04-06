@@ -1,0 +1,31 @@
+version: "3.2"
+services:
+  frontend:
+    build:
+      context: frontend/
+      dockerfile: Dockerfile.dev
+    ports:
+      - 9000:9000
+    volumes:
+      - ./frontend:/app
+    environment:
+      VECTOR_URL: http://localhost:8686/playground
+    depends_on:
+      - backend
+
+  backend:
+    build:
+      context: backend/
+      dockerfile: Dockerfile.dev
+    ports:
+      - 8000:8000
+    volumes:
+      - ./backend:/app
+
+  vector:
+    image: timberio/vector:0.37.0-debian
+    volumes:
+      - ./vector:/etc/vector
+    command: ["--config", "/etc/vector/config.toml"]
+    ports:
+      - 8686:8686

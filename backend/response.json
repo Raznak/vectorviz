@@ -1,0 +1,96 @@
+{
+    "data": {
+        "sources": {
+            "edges": [
+                {
+                    "node": {
+                        "componentId": "Notification_Event_Kafka_Prd",
+                        "metrics": {
+                            "receivedEventsTotal": {
+                                "receivedEventsTotal": 149
+                            }
+                        }
+                    }
+                },
+                {
+                    "node": {
+                        "componentId": "Event_Edward_Kafka_Prd",
+                        "metrics": {
+                            "receivedEventsTotal": {
+                                "receivedEventsTotal": 185
+                            }
+                        }
+                    }
+                },
+                {
+                    "node": {
+                        "componentId": "Notification_Event_Kafka_Dev",
+                        "metrics": {
+                            "receivedEventsTotal": {
+                                "receivedEventsTotal": 196
+                            }
+                        }
+                    }
+                },
+                {
+                    "node": {
+                        "componentId": "Notification_Event_Kafka_Staging",
+                        "metrics": {
+                            "receivedEventsTotal": {
+                                "receivedEventsTotal": 164
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "transforms": {
+            "edges": [
+                {
+                    "node": {
+                        "componentId": "Drop_Edward_Kafka_From_Datadog",
+                        "metrics": {
+                            "sentEventsTotal": {
+                                "sentEventsTotal": 25
+                            }
+                        }
+                    }
+                },
+                {
+                    "node": {
+                        "componentId": "Remap_Notification_Event_Kafka",
+                        "metrics": {
+                            "sentEventsTotal": {
+                                "sentEventsTotal": 0
+                            }
+                        }
+                    }
+                },
+                {
+                    "node": {
+                        "componentId": "Remap_Event_Edward_Kafka",
+                        "metrics": {
+                            "sentEventsTotal": {
+                                "sentEventsTotal": 1194
+                            }
+                        }
+                    }
+                }
+            ]
+        },
+        "sinks": {
+            "edges": [
+                {
+                    "node": {
+                        "componentId": "Event_Datadog",
+                        "metrics": {
+                            "sentBytesTotal": {
+                                "sentBytesTotal": 6106
+                            }
+                        }
+                    }
+                }
+            ]
+        }
+    }
+}

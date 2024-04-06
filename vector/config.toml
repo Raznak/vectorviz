@@ -1,0 +1,37 @@
+[api]
+address = "0.0.0.0:8686"
+enabled = true
+
+[sources.demo]
+type = "demo_logs"
+format = "json"
+interval = 1.0
+
+# [sources.demo1]
+# type = "demo_logs"
+# format = "json"
+# interval = 1.0
+
+[transforms.json]
+type = "remap"
+inputs = ["demo"]
+source = '''
+. = .message
+'''
+
+# [transforms.json1]
+# type = "remap"
+# inputs = ["demo1"]
+# source = '''
+# . = .message
+# '''
+
+[sinks.console]
+type = "console"
+inputs = ["json"]
+encoding.codec = "text"
+
+# [sinks.console1]
+# type = "console"
+# inputs = ["json1"]
+# encoding.codec = "text"

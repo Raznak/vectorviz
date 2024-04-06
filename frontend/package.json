@@ -1,0 +1,43 @@
+{
+  "name": "frontend",
+  "version": "0.0.1",
+  "description": "Observability Pipelines",
+  "productName": "Observability Pipelines",
+  "author": "Olivier de Régis <olivier@deregis.fr>",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "lint": "eslint --ext .js,.vue ./",
+    "format": "prettier --write \"**/*.{js,vue,scss,html,md,json}\" --ignore-path .gitignore",
+    "test": "echo \"No test specified\" && exit 0",
+    "dev": "quasar dev",
+    "build": "quasar build"
+  },
+  "dependencies": {
+    "@quasar/extras": "^1.16.4",
+    "@vue-flow/background": "^1.3.0",
+    "@vue-flow/controls": "^1.1.1",
+    "@vue-flow/core": "^1.33.5",
+    "@vue-flow/minimap": "^1.4.0",
+    "axios": "^1.2.1",
+    "dagre": "^0.8.5",
+    "quasar": "^2.6.0",
+    "vue": "^3.4.18",
+    "vue-router": "^4.0.0"
+  },
+  "devDependencies": {
+    "@quasar/app-vite": "^2.0.0-beta.5",
+    "autoprefixer": "^10.4.2",
+    "eslint": "^8.11.0",
+    "eslint-config-prettier": "^9.0.0",
+    "eslint-plugin-vue": "^9.0.0",
+    "postcss": "^8.4.14",
+    "prettier": "^3.0.3",
+    "vite-plugin-checker": "^0.6.4"
+  },
+  "engines": {
+    "node": "^24 || ^22 || ^20 || ^18",
+    "npm": ">= 6.13.4",
+    "yarn": ">= 1.21.1"
+  }
+}

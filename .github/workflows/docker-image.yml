@@ -1,0 +1,26 @@
+name: Build Docker
+
+on:
+  workflow_dispatch:
+    inputs:
+      VERSION:
+        description: "Release version"
+        required: true
+
+env:
+  VERSION: ${{ github.event.inputs.VERSION }}
+
+jobs:
+  build:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Build docker image
+        run: sudo docker build -t vectorviz:$VERSION --build-arg VERSION=$VERSION .
+      - name: Log into github registry
+        run: echo ${{ secrets.PERSONNAL_TOKEN }} | sudo docker login ghcr.io -u raznak --password-stdin
+      - name: Tag the image
+        run: sudo docker tag vectorviz:$VERSION ghcr.io/raznak/vectorviz:$VERSION
+      - name: Push the image
+        run: sudo docker push ghcr.io/raznak/vectorviz:$VERSION
