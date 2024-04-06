@@ -19,8 +19,6 @@ COPY ./backend/ /app
 COPY --from=frontend-stage /app/dist /app/templates
 WORKDIR /app
 
-RUN mkdir -p /var/log/mdm/
-RUN chmod +x /app/init.sh
 EXPOSE 8000
 
-CMD ["/app/init.sh"]
+CMD ["/env/bin/uvicorn", "app.main:app"]
