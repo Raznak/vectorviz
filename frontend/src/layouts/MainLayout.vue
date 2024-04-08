@@ -12,7 +12,8 @@ const $q = useQuasar();
 const loading = ref(false);
 const meta = ref({});
 const hostMetrics = ref({});
-const url = ref("http://vector:8686");
+const urls = ref([]);
+const selectedUrl = ref("");
 const nodes = ref([]);
 const edges = ref([]);
 
@@ -29,7 +30,7 @@ const getStyle = () => {
 const fetchGraph = async () => {
   loading.value = true;
   const params = {
-    url: url.value,
+    url: selectedUrl.value,
   };
 
   nodes.value = [];
@@ -93,10 +94,17 @@ const fetchGraph = async () => {
   }
 };
 
-onMounted(() => {
-  if (url.value !== "") {
-    fetchGraph();
-  }
+const getUrls = async () => {
+  loading.value = true;
+  const { data } = await api.get("/urls");
+  urls.value = data.urls;
+  selectedUrl.value = data.urls[0];
+  loading.value = false;
+  await fetchGraph();
+};
+
+onMounted(async () => {
+  await getUrls();
 });
 </script>
 
@@ -109,20 +117,23 @@ onMounted(() => {
             src="https://avatars.githubusercontent.com/u/16866914?s=200&v=4"
           />
         </q-avatar>
-        <q-input
-          style="width: 40%"
+        <q-select
+          v-model="selectedUrl"
+          outlined
+          :options="urls"
           dense
-          :loading="loading"
-          square
-          bg-color="white"
-          @keyup.enter="fetchGraph()"
           filled
-          v-model="url"
+          square
+          style="width: 30%"
+          @update:model-value="fetchGraph"
+          bg-color="white"
+          :loading="loading"
+          label="Vector URL"
         >
-          <template v-slot:append>
-            <q-btn @click="fetchGraph()" dense flat icon="send" />
+          <template v-slot:after>
+            <q-btn color="white" @click="fetchGraph()" dense flat icon="send" />
           </template>
-        </q-input>
+        </q-select>
       </q-toolbar>
     </q-header>
 

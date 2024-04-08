@@ -24,3 +24,7 @@ jobs:
         run: sudo docker tag vectorviz:$VERSION ghcr.io/raznak/vectorviz:$VERSION
       - name: Push the image
         run: sudo docker push ghcr.io/raznak/vectorviz:$VERSION
+      - name: Tag the image
+        run: sudo docker tag vectorviz:$VERSION ghcr.io/raznak/vectorviz:latest
+      - name: Push the image
+        run: sudo docker push ghcr.io/raznak/vectorviz:latest

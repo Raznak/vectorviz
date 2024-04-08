@@ -5,6 +5,17 @@ Enable API on your Vector conf.
 
 ## How To
 
+Pull docker image: `docker pull ghcr.io/raznak/vectorviz`  
+Launch:
+
+```
+docker run -p 8000:8000 -e VECTOR_URLS=http://vector1:8686,http://vector2:8686
+```
+
+Go to http://localhost:8000
+
+## DEVELOP
+
 Launch dockers:
 
 ```

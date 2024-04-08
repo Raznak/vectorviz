@@ -77,6 +77,11 @@ def format_response(tmp_data):
     }
 
 
+@app.get("/urls")
+async def read_urls():
+    return {"urls": settings.VECTOR_URLS.split(",")}
+
+
 @app.get("/query")
 async def read_query(url: str):
     try:

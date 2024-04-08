@@ -8,8 +8,6 @@ services:
       - 9000:9000
     volumes:
       - ./frontend:/app
-    environment:
-      VECTOR_URL: http://localhost:8686/playground
     depends_on:
       - backend
 
@@ -19,6 +17,7 @@ services:
       dockerfile: Dockerfile.dev
     environment:
       DEV_MODE: yes
+      VECTOR_URLS: http://vector:8686
     ports:
       - 8000:8000
     volumes:
