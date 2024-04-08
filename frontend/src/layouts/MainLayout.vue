@@ -12,7 +12,7 @@ const $q = useQuasar();
 const loading = ref(false);
 const meta = ref({});
 const hostMetrics = ref({});
-const url = ref("http://vector:8686");
+const url = ref("");
 const nodes = ref([]);
 const edges = ref([]);
 
@@ -35,58 +35,68 @@ const fetchGraph = async () => {
   nodes.value = [];
   edges.value = [];
 
-  const { data } = await api.get("/query", { params });
+  try {
+    const { data } = await api.get("/query", { params });
+    meta.value = data.meta;
+    hostMetrics.value = data.hostMetrics;
 
-  meta.value = data.meta;
-  hostMetrics.value = data.hostMetrics;
+    for (const tmp_node of data.nodes) {
+      let tmp = {
+        id: tmp_node.id,
+        label: tmp_node.label,
+        type: tmp_node.type,
+        events: tmp_node.metrics,
+        position: { x: Math.random() * 400, y: Math.random() * 400 },
+      };
 
-  for (const tmp_node of data.nodes) {
-    let tmp = {
-      id: tmp_node.id,
-      label: tmp_node.label,
-      type: tmp_node.type,
-      events: tmp_node.metrics,
-      position: { x: Math.random() * 400, y: Math.random() * 400 },
-    };
+      if (tmp_node.type === "sources") {
+        tmp.class = "node-sources";
+        tmp.sourcePosition = Position.Right;
+        tmp.targetPosition = Position.Right;
+      } else if (tmp_node.type === "transforms") {
+        tmp.class = "node-transforms";
+        tmp.sourcePosition = Position.Right;
+        tmp.targetPosition = Position.Left;
+      } else if (tmp_node.type === "sinks") {
+        tmp.class = "node-sinks";
+        tmp.targetPosition = Position.Left;
+        tmp.sourcePosition = Position.Left;
+      }
 
-    if (tmp_node.type === "sources") {
-      tmp.class = "node-sources";
-      tmp.sourcePosition = Position.Right;
-      tmp.targetPosition = Position.Right;
-    } else if (tmp_node.type === "transforms") {
-      tmp.class = "node-transforms";
-      tmp.sourcePosition = Position.Right;
-      tmp.targetPosition = Position.Left;
-    } else if (tmp_node.type === "sinks") {
-      tmp.class = "node-sinks";
-      tmp.targetPosition = Position.Left;
-      tmp.sourcePosition = Position.Left;
+      nodes.value.push(tmp);
     }
 
-    nodes.value.push(tmp);
-  }
+    for (const tmp of data.edges) {
+      edges.value.push({
+        ...tmp,
+      });
+    }
 
-  for (const tmp of data.edges) {
-    edges.value.push({
-      ...tmp,
+    if (!style.value) {
+      nextTick(() => {
+        getStyle();
+      });
+    }
+
+    setTimeout(async () => {
+      await fetchGraph();
+    }, 2000);
+  } catch (err) {
+    $q.notify({
+      message: err.response.data.detail,
+      type: "negative",
+      position: "top",
+      timeout: 2000,
     });
+  } finally {
+    loading.value = false;
   }
-
-  // edges.value = data.edges;
-  loading.value = false;
 };
 
 onMounted(() => {
-  fetchGraph();
-  nextTick(() => {
-    setTimeout(() => {
-      getStyle();
-    }, 200);
-
-    setInterval(() => {
-      fetchGraph();
-    }, 1000);
-  });
+  if (url.value !== "") {
+    fetchGraph();
+  }
 });
 </script>
 
@@ -233,7 +243,7 @@ onMounted(() => {
               </q-card-section>
             </q-card>
           </div>
-          <div class="col-10" id="colGraph">
+          <div class="col-10" id="colGraph" v-if="nodes.length > 0">
             <div v-if="style" :style="style">
               <GraphComp :tmp_nodes="nodes" :tmp_edges="edges" />
             </div>

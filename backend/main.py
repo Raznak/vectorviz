@@ -1,5 +1,6 @@
 from fastapi import FastAPI, HTTPException, status, Request
 from fastapi.middleware.cors import CORSMiddleware
+from urllib3.exceptions import NewConnectionError
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
@@ -68,8 +69,12 @@ async def read_query(url: str):
         response = requests.post(f"{url}/graphql", json={"query": query})
         response.raise_for_status()
         return format_response(response.json()["data"])
+    except NewConnectionError:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to connect to {url}",
+        )
     except requests.exceptions.RequestException as e:
-        print(e)
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to fetch data from {url}",
