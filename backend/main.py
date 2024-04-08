@@ -28,11 +28,15 @@ def format_response(tmp_data):
         for node in tmp_data[type_]["edges"]:
             node = node["node"]
             parents = []
+            childs = []
             for source in node.get("sources", []):
                 parents.append(source["componentId"])
 
             for transform in node.get("transforms", []):
-                parents.append(transform["componentId"])
+                if type_ == "transforms":
+                    childs.append(transform["componentId"])
+                else:
+                    parents.append(transform["componentId"])
 
             nodes.append(
                 {
@@ -49,6 +53,16 @@ def format_response(tmp_data):
                         "id": f"{parent}-{node['componentId']}",
                         "source": parent,
                         "target": node["componentId"],
+                        "animated": True,
+                    }
+                )
+
+            for child in childs:
+                edges.append(
+                    {
+                        "id": f"{node['componentId']}-{child}",
+                        "source": node["componentId"],
+                        "target": child,
                         "animated": True,
                     }
                 )

@@ -7,11 +7,6 @@ type = "demo_logs"
 format = "json"
 interval = 1.0
 
-# [sources.demo1]
-# type = "demo_logs"
-# format = "json"
-# interval = 1.0
-
 [transforms.json]
 type = "remap"
 inputs = ["demo"]
@@ -19,19 +14,13 @@ source = '''
 . = .message
 '''
 
-# [transforms.json1]
-# type = "remap"
-# inputs = ["demo1"]
-# source = '''
-# . = .message
-# '''
+[transforms.drop]
+type = "filter"
+inputs = ["json"]
+condition = ".source == \"demo\""
+
 
 [sinks.console]
 type = "console"
-inputs = ["json"]
+inputs = ["drop"]
 encoding.codec = "text"
-
-# [sinks.console1]
-# type = "console"
-# inputs = ["json1"]
-# encoding.codec = "text"

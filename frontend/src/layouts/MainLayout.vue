@@ -12,7 +12,7 @@ const $q = useQuasar();
 const loading = ref(false);
 const meta = ref({});
 const hostMetrics = ref({});
-const url = ref("");
+const url = ref("http://vector:8686");
 const nodes = ref([]);
 const edges = ref([]);
 
@@ -80,7 +80,7 @@ const fetchGraph = async () => {
 
     setTimeout(async () => {
       await fetchGraph();
-    }, 2000);
+    }, 60000);
   } catch (err) {
     $q.notify({
       message: err.response.data.detail,
