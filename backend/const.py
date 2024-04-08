@@ -89,6 +89,10 @@ query {
           componentId
           componentType
         }
+        transforms {
+          componentId
+          componentType
+        }
         metrics {
           # Total events that the transform has sent out.
           sentEventsTotal {
@@ -109,6 +113,10 @@ query {
     edges {
       node {
         componentId
+        sources {
+          componentId
+          componentType
+        }
         transforms {
           componentId
           componentType
