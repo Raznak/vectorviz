@@ -48,7 +48,7 @@ query {
       writesCompletedTotal
     }
   }
-  sources(first: 5) {
+  sources(first: 10) {
     # See https: //relay.dev/graphql/connections.htm
     edges {
       node {
@@ -81,7 +81,7 @@ query {
     }
   }
 
-  transforms {
+  transforms(first: 10) {
     edges {
       node {
         componentId
@@ -105,7 +105,7 @@ query {
   }
 
   # Get the last 3 sinks.
-  sinks(last: 3) {
+  sinks(first: 10) {
     edges {
       node {
         componentId
