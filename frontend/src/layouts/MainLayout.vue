@@ -10,6 +10,7 @@ import GraphComp from "src/components/GraphComp.vue";
 
 const $q = useQuasar();
 const loading = ref(false);
+const health = ref(false);
 const meta = ref({});
 const hostMetrics = ref({});
 const urls = ref([]);
@@ -80,7 +81,7 @@ const fetchGraph = async () => {
     }
 
     setTimeout(async () => {
-      await fetchGraph();
+      await load();
     }, 60000);
   } catch (err) {
     $q.notify({
@@ -94,13 +95,26 @@ const fetchGraph = async () => {
   }
 };
 
+const fetchHealth = async () => {
+  const params = {
+    url: selectedUrl.value,
+  };
+  const { data } = await api.get("/health", { params });
+  health.value = data;
+};
+
+const load = async () => {
+  await fetchHealth();
+  await fetchGraph();
+};
+
 const getUrls = async () => {
   loading.value = true;
   const { data } = await api.get("/urls");
   urls.value = data.urls;
   selectedUrl.value = data.urls[0];
   loading.value = false;
-  await fetchGraph();
+  await load();
 };
 
 onMounted(async () => {
@@ -125,13 +139,13 @@ onMounted(async () => {
           filled
           square
           style="width: 30%"
-          @update:model-value="fetchGraph"
+          @update:model-value="load"
           bg-color="white"
           :loading="loading"
           label="Vector URL"
         >
           <template v-slot:after>
-            <q-btn color="white" @click="fetchGraph()" dense flat icon="send" />
+            <q-btn color="white" @click="load" dense flat icon="send" />
           </template>
         </q-select>
       </q-toolbar>
@@ -144,12 +158,26 @@ onMounted(async () => {
             <q-card square dark class="full-height bg-blue-grey-10">
               <q-card-section>
                 <q-list dense>
+                  <q-item-label header>Health</q-item-label>
+                  <q-item>
+                    <q-item-section> Status: </q-item-section>
+                    <q-item-section side>
+                      <q-chip
+                        size="md"
+                        square
+                        dark
+                        :color="health.ok ? 'green-8' : 'red-8'"
+                      >
+                        {{ health.ok ? "OK" : "KO" }}
+                      </q-chip>
+                    </q-item-section>
+                  </q-item>
                   <q-item>
                     <q-item-section> Version: </q-item-section>
                     <q-item-section side>
-                      <q-badge color="primary">
+                      <q-chip square color="primary">
                         {{ meta.version }}
-                      </q-badge>
+                      </q-chip>
                     </q-item-section>
                   </q-item>
                 </q-list>
@@ -158,25 +186,25 @@ onMounted(async () => {
                   <q-item>
                     <q-item-section> Used: </q-item-section>
                     <q-item-section side>
-                      <q-badge color="primary">
+                      <q-chip square color="primary">
                         {{ humanFileSize(hostMetrics.memory.usedBytes) }}
-                      </q-badge>
+                      </q-chip>
                     </q-item-section>
                   </q-item>
                   <q-item>
                     <q-item-section> Free: </q-item-section>
                     <q-item-section side>
-                      <q-badge color="primary">
+                      <q-chip square color="primary">
                         {{ humanFileSize(hostMetrics.memory.freeBytes) }}
-                      </q-badge>
+                      </q-chip>
                     </q-item-section>
                   </q-item>
                   <q-item>
                     <q-item-section> Total: </q-item-section>
                     <q-item-section side>
-                      <q-badge color="primary">
+                      <q-chip square color="primary">
                         {{ humanFileSize(hostMetrics.memory.totalBytes) }}
-                      </q-badge>
+                      </q-chip>
                     </q-item-section>
                   </q-item>
                 </q-list>
@@ -185,17 +213,17 @@ onMounted(async () => {
                   <q-item>
                     <q-item-section> Used: </q-item-section>
                     <q-item-section side>
-                      <q-badge color="primary">
+                      <q-chip square color="primary">
                         {{ humanFileSize(hostMetrics.swap.usedBytes) }}
-                      </q-badge>
+                      </q-chip>
                     </q-item-section>
                   </q-item>
                   <q-item>
                     <q-item-section> Free: </q-item-section>
                     <q-item-section side>
-                      <q-badge color="primary">
+                      <q-chip square color="primary">
                         {{ humanFileSize(hostMetrics.swap.freeBytes) }}
-                      </q-badge>
+                      </q-chip>
                     </q-item-section>
                   </q-item>
                 </q-list>
@@ -204,17 +232,17 @@ onMounted(async () => {
                   <q-item>
                     <q-item-section> Used: </q-item-section>
                     <q-item-section side>
-                      <q-badge color="primary">
+                      <q-chip square color="primary">
                         {{ humanFileSize(hostMetrics.filesystem.usedBytes) }}
-                      </q-badge>
+                      </q-chip>
                     </q-item-section>
                   </q-item>
                   <q-item>
                     <q-item-section> Free: </q-item-section>
                     <q-item-section side>
-                      <q-badge color="primary">
+                      <q-chip square color="primary">
                         {{ humanFileSize(hostMetrics.filesystem.freeBytes) }}
-                      </q-badge>
+                      </q-chip>
                     </q-item-section>
                   </q-item>
                 </q-list>
@@ -223,31 +251,31 @@ onMounted(async () => {
                   <q-item>
                     <q-item-section> Load1: </q-item-section>
                     <q-item-section side>
-                      <q-badge color="primary">
+                      <q-chip square color="primary">
                         {{
                           parseFloat(hostMetrics.loadAverage.load1).toFixed(2)
                         }}
-                      </q-badge>
+                      </q-chip>
                     </q-item-section>
                   </q-item>
                   <q-item>
                     <q-item-section> Load5: </q-item-section>
                     <q-item-section side>
-                      <q-badge color="primary">
+                      <q-chip square color="primary">
                         {{
                           parseFloat(hostMetrics.loadAverage.load5).toFixed(2)
                         }}
-                      </q-badge>
+                      </q-chip>
                     </q-item-section>
                   </q-item>
                   <q-item>
                     <q-item-section> Load15: </q-item-section>
                     <q-item-section side>
-                      <q-badge color="primary">
+                      <q-chip square color="primary">
                         {{
                           parseFloat(hostMetrics.loadAverage.load15).toFixed(2)
                         }}
-                      </q-badge>
+                      </q-chip>
                     </q-item-section>
                   </q-item>
                 </q-list>

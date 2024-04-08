@@ -100,6 +100,24 @@ async def read_query(url: str):
         ) from e
 
 
+@app.get("/health")
+def health(url: str):
+    try:
+        response = requests.get(f"{url}/health")
+        response.raise_for_status()
+        return response.json()
+    except NewConnectionError:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to connect to {url}",
+        )
+    except requests.exceptions.RequestException as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Failed to fetch data from {url}",
+        ) from e
+
+
 if not settings.DEV_MODE:
     templates = Jinja2Templates(directory="templates/spa/")
 
