@@ -1,12 +1,10 @@
-from fastapi import FastAPI, HTTPException, status, Request
 from fastapi.middleware.cors import CORSMiddleware
-from urllib3.exceptions import NewConnectionError
+from routers.main import router as main_router
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 from fastapi.staticfiles import StaticFiles
-from settings import settings
-from const import query
-import requests
+from fastapi import FastAPI, Request
+from core.settings import settings
 import uvicorn
 
 app = FastAPI()
@@ -19,103 +17,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
-def format_response(tmp_data):
-    nodes = []
-    edges = []
-
-    for type_ in ("sources", "transforms", "sinks"):
-        for node in tmp_data[type_]["edges"]:
-            node = node["node"]
-            parents = []
-            childs = []
-            for source in node.get("sources", []):
-                parents.append(source["componentId"])
-
-            for transform in node.get("transforms", []):
-                if type_ == "transforms":
-                    childs.append(transform["componentId"])
-                else:
-                    parents.append(transform["componentId"])
-
-            nodes.append(
-                {
-                    "id": node["componentId"],
-                    "label": node["componentId"],
-                    "type": type_,
-                    "metrics": node["metrics"],
-                }
-            )
-
-            for parent in parents:
-                edges.append(
-                    {
-                        "id": f"{parent}-{node['componentId']}",
-                        "source": parent,
-                        "target": node["componentId"],
-                        "animated": True,
-                    }
-                )
-
-            for child in childs:
-                edges.append(
-                    {
-                        "id": f"{node['componentId']}-{child}",
-                        "source": node["componentId"],
-                        "target": child,
-                        "animated": True,
-                    }
-                )
-
-    return {
-        "nodes": nodes,
-        "edges": edges,
-        "meta": {
-            "version": tmp_data["meta"]["versionString"].split(" ")[0],
-        },
-        "hostMetrics": tmp_data["hostMetrics"],
-    }
+app.include_router(main_router)
 
 
-@app.get("/urls")
-async def read_urls():
-    return {"urls": settings.VECTOR_URLS.split(",")}
-
-
-@app.get("/query")
-async def read_query(url: str):
-    try:
-        response = requests.post(f"{url}/graphql", json={"query": query})
-        response.raise_for_status()
-        return format_response(response.json()["data"])
-    except NewConnectionError:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to connect to {url}",
-        )
-    except requests.exceptions.RequestException as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to fetch data from {url}",
-        ) from e
-
-
-@app.get("/health")
-def health(url: str):
-    try:
-        response = requests.get(f"{url}/health")
-        response.raise_for_status()
-        return response.json()
-    except NewConnectionError:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to connect to {url}",
-        )
-    except requests.exceptions.RequestException as e:
-        raise HTTPException(
-            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Failed to fetch data from {url}",
-        ) from e
+@app.get("/ping")
+async def health():
+    return "pong"
 
 
 if not settings.DEV_MODE:

@@ -1,7 +1,7 @@
 # VectorViz
 
 This app is a Vector visualizer.  
-Enable API on your Vector conf.
+You will need to enable API on your Vector conf: [docs](https://vector.dev/docs/reference/api)
 
 ## How To
 

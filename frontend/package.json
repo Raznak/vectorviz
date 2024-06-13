@@ -1,8 +1,8 @@
 {
   "name": "frontend",
   "version": "0.0.1",
-  "description": "Observability Pipelines",
-  "productName": "Observability Pipelines",
+  "description": "VectorViz",
+  "productName": "VectorViz",
   "author": "Olivier de Régis <olivier@deregis.fr>",
   "type": "module",
   "private": true,
