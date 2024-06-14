@@ -1,134 +1,28 @@
+api:
+  enabled: true
+  address: 0.0.0.0:8686
 sources:
-  Event_Edward_Kafka_Prd:
-    type: kafka
-    auto_offset_reset: smallest
-    bootstrap_servers: lkc-62xg8-4jv7m.eu-west-3.aws.glb.confluent.cloud:9092
-    group_id: datadogeventselenium
-    sasl:
-      enabled: true
-      mechanism: PLAIN
-      username: ATOT72FS4ZU4G4GG
-    tls:
-      enabled: true
-    topics:
-    - prd_obs_out_event_apic_ini
-  Notification_Event_Kafka_Dev:
-    type: kafka
-    auto_offset_reset: smallest
-    bootstrap_servers: lkc-xg1ox-lqjjp.eu-west-3.aws.glb.confluent.cloud:9092
-    group_id: consumerobs
-    metrics:
-      topic_lag_metric: true
-    sasl:
-      enabled: true
-      mechanism: PLAIN
-      username: QCZ52T4GG3TPFQVW
-    tls:
-      enabled: true
-    topics:
-    - dev_pdl_out_alertingpdl_ini
-  Notification_Event_Kafka_Prd:
-    type: kafka
-    auto_offset_reset: smallest
-    bootstrap_servers: lkc-62xg8-4jv7m.eu-west-3.aws.glb.confluent.cloud:9092
-    group_id: consumerobs
-    metrics:
-      topic_lag_metric: true
-    sasl:
-      enabled: true
-      mechanism: PLAIN
-      username: ATOT72FS4ZU4G4GG
-    tls:
-      enabled: true
-    topics:
-    - prd_pdl_out_alertingpdl_ini
-  Notification_Event_Kafka_Staging:
-    type: kafka
-    auto_offset_reset: smallest
-    bootstrap_servers: lkc-xg1ox-lqjjp.eu-west-3.aws.glb.confluent.cloud:9092
-    group_id: consumerobs
-    metrics:
-      topic_lag_metric: true
-    sasl:
-      enabled: true
-      mechanism: PLAIN
-      username: RUSPVFZITTHXPECQ
-    tls:
-      enabled: true
-    topics:
-    - staging_pdl_out_alertingpdl_ini
-transforms:
-  Drop_Edward_Kafka_From_Datadog:
-    type: filter
-    inputs:
-    - Remap_Event_Edward_Kafka
-    condition:
-      source: .source == "selenium"
-      type: vrl
-  Remap_Event_Edward_Kafka:
-    type: remap
-    inputs:
-    - Event_Edward_Kafka_Prd
-    drop_on_error: false
-    metric_tag_values: full
-    reroute_dropped: false
-    source: |+
-      . = parse_json!(string!(.message))
-      . = .payload
-      del(.date)
-      del(.name)
-      del(.component)
-      del(.is_test)
-      del(.generate_ticket)
-      del(.availability)
-
-
-      if (match!(.type, r'triggered')) {
-          .alert_type = "error"
-      } else if (match!(.type, r'recovered')) {
-          .alert_type = "success"
-      }
-
-      del(.tags.step_name)
-
-      .text = del(.tags.scenario_name)
-      .title = .raw.title
-      .tags.env = del(.env)
-      .tags.source = .source
-      del(.tags.name)
-      test = encode_key_value!(.tags, [], ":", "@|@|@")
-      .tags = split(test, "@|@|@")
-      del(.raw)
-
-
-  Remap_Notification_Event_Kafka:
-    type: remap
-    inputs:
-    - Notification_Event_Kafka_Dev
-    - Notification_Event_Kafka_Staging
-    - Notification_Event_Kafka_Prd
-    metric_tag_values: full
-    source: |-
-      . = parse_json!(string!(.message))
-      .title = del(.rule_name)
-      .text = del(.description)
-      del(.rule_id)
-      del(.@version)
-      del(.alert_id)
-      del(.priority)
-      del(.obs)
-      del(.timestamp)
-      del(.actions)
-      del(.@timestamp)
-      del(.env)
-      test = encode_key_value!(.alert_tags, [], ":")
-      .tags = split(test, " ")
-      .alert_type = "error"
+  kubernetes_logs:
+    type: kubernetes_logs
+    self_node_name: "bonsoir"
+    extra_label_selector: "app in (backend, vault),app.kubernetes.io/instance=koddex-poc-develop"
 sinks:
-  Event_Datadog:
-    type: console
+  zinc:
+    type: "http"
     inputs:
-    - Remap_Notification_Event_Kafka
-    - Drop_Edward_Kafka_From_Datadog
+      - kubernetes_logs
+    uri: "https://api.openobserve.ai/api/admin_organization_20704_yg9TjdWXWVB3y13/koddex/_json"
+    method: "post"
+    batch:
+      max_bytes: 1048576  # Réduisez cette valeur si nécessaire, par exemple 524288 (512 KB)
+      timeout_secs: 1
+    auth:
+      strategy: "basic"
+      user: "infra.service@koddex.app"
+      password: "89k1V2ul6X04F7p35WvM"
+    compression: gzip
     encoding:
-      codec: json
+      codec: "json"
+      timestamp_format: "rfc3339"
+    healthcheck:
+      enabled: false

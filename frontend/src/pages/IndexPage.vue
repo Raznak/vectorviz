@@ -103,11 +103,14 @@ const load = async () => {
   health.value = false;
   hostMetrics.value = {};
 
+  if (!selectedUrl.value) {
+    return;
+  }
+
   try {
     loading.value = true;
     await fetchHealth();
     await fetchGraph();
-    loading.value = false;
   } catch (err) {
     notify = $q.notify({
       message: err.response.data.detail,
@@ -115,6 +118,8 @@ const load = async () => {
       position: "top",
       timeout: 2000,
     });
+  } finally {
+    loading.value = false;
   }
 };
 

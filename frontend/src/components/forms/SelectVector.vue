@@ -40,6 +40,7 @@ onMounted(async () => {
         bg-color="white"
         :loading="loading"
         label="Vector URL"
+        use-chips
       />
     </q-item>
     <q-separator inset />
