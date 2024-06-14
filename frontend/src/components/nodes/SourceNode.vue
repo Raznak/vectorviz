@@ -13,7 +13,7 @@ const props = defineProps({
   <div class="text-center q-px-xs">
     <p class="q-ma-none">Source: {{ node.label }}</p>
     <p class="text-bold q-ma-none">
-      {{ node.events.receivedEventsTotal.receivedEventsTotal }} Events
+      {{ node.events.sentEventsTotal.sentEventsTotal }} Events
     </p>
   </div>
 
