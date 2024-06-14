@@ -1,9 +1,24 @@
 <script setup>
 import HeaderComp from "src/components/HeaderComp.vue";
 import SelectVector from "src/components/forms/SelectVector.vue";
-import { ref } from "vue";
+import { useQuasar } from "quasar";
+import { onMounted, ref } from "vue";
 
+const $q = useQuasar();
 const selectedUrl = ref(null);
+
+const style = ref(null);
+const getStyle = () => {
+  const elem = document.getElementById("page");
+  style.value = {
+    width: `${elem.offsetWidth}px`,
+    height: `${elem.offsetHeight}px`,
+  };
+};
+
+onMounted(() => {
+  getStyle();
+});
 </script>
 
 <template>
@@ -25,7 +40,11 @@ const selectedUrl = ref(null);
     </q-drawer>
 
     <q-page-container>
-      <q-page> </q-page>
+      <q-page id="page">
+        <span v-if="style">
+          <iframe :style="style" src="https://playground.vrl.dev/"></iframe>
+        </span>
+      </q-page>
     </q-page-container>
   </q-layout>
 </template>

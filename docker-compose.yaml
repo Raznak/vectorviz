@@ -17,7 +17,7 @@ services:
       dockerfile: Dockerfile.dev
     environment:
       DEV_MODE: yes
-      VECTOR_URLS: "http://vector:8686,http://vector:8687"
+      VECTOR_URLS: "http://192.168.64.1:8686"
     ports:
       - 8000:8000
     volumes:
