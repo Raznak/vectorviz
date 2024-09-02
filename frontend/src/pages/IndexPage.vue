@@ -134,11 +134,11 @@ watch(selectedUrl, async () => {
 
     <q-drawer show-if-above side="left" class="bg-primary">
       <q-toolbar class="bg-primary text-white">
-        <q-avatar class="q-mr-sm">
+        <!-- <q-avatar class="q-mr-sm">
           <img
             src="https://avatars.githubusercontent.com/u/16866914?s=200&v=4"
           />
-        </q-avatar>
+        </q-avatar> -->
         VectorViz
       </q-toolbar>
 
