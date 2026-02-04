@@ -1,0 +1,3 @@
+vector_local:
+  url: http://192.168.0.234:8686
+  config_file: /vector/config.yaml
