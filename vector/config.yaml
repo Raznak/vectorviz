@@ -1,0 +1,50 @@
+api:
+  enabled: true
+  address: 0.0.0.0:8686
+sources:
+  demo:
+    type: demo_logs
+    format: json
+    interval: 1.0
+
+transforms:
+  json:
+    type: remap
+    inputs:
+      - demo
+    source: |
+      . = parse_json!(.message)
+  
+  filter_get:
+    type: filter
+    inputs:
+      - json
+    condition: '.method != "GET"'
+
+  log_route:
+    type: route
+    inputs:
+      - filter_get
+    route:
+      post_logs:
+        source: '.method == "POST"'
+        type: "vrl"
+      default:
+        source: '.method != "POST"'
+        type: "vrl"
+  
+
+sinks:
+  console_post:
+    type: console
+    inputs:
+      - log_route.post_logs
+    encoding:
+      codec: json
+  
+  console_default:
+    type: console
+    inputs:
+      - log_route.default
+    encoding:
+      codec: json

@@ -1,4 +1,4 @@
-FROM node:20 as frontend-stage
+FROM node:22 as frontend-stage
 WORKDIR /app
 COPY ./frontend/ .
 RUN yarn install

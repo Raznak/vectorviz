@@ -17,16 +17,17 @@ services:
       dockerfile: Dockerfile.dev
     environment:
       DEV_MODE: yes
-      VECTOR_URLS: "http://192.168.64.1:8686,http://mescouillessurtinnezcafaitundindon:8686"
+      VECTOR_CONFIG_MAP_PATH: "/vector/map.yaml"
     ports:
       - 8000:8000
     volumes:
       - ./backend:/app
+      - ./vector:/vector
 
   vector:
     image: timberio/vector:0.37.0-debian
     volumes:
       - ./vector:/etc/vector
-    command: ["--config", "/etc/vector/config.toml"]
+    command: ["--config", "/etc/vector/config.yaml"]
     ports:
       - 8686:8686
